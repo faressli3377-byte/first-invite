@@ -222,10 +222,10 @@ function tick() {
     const s = Math.floor((diff % 60000) / 1000);
     const pad = (n) => String(n).padStart(2, '0');
     
-    $('#cd-days').textContent = pad(d);
-    $('#cd-hours').textContent = pad(h);
-    $('#cd-mins').textContent = pad(m);
-    $('#cd-secs').textContent = pad(s);
+$('#cd-days').text(pad(d));
+$('#cd-hours').text(pad(h));
+$('#cd-mins').text(pad(m));
+$('#cd-secs').text(pad(s));
   }
   tick();
   setInterval(tick, 1000);
