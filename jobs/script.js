@@ -210,10 +210,17 @@ function spawnPetals() {
    COUNTDOWN
    ============================================================ */
 function initCountdown() {
-  const target = new Date(2026, 4, 1, 18, 0, 0).getTime();
+  const target = new Date('2026-07-10T18:00:00');
 
   function tick() {
-    const diff = Math.abs(target - Date.now());
+    const diff = target - Date.now();
+    if (diff <= 0) {
+      $('#cd-days').textContent = '00';
+      $('#cd-hours').textContent = '00';
+      $('#cd-mins').textContent = '00';
+      $('#cd-secs').textContent = '00';
+      return;
+    }
 
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
@@ -221,11 +228,12 @@ function initCountdown() {
     const s = Math.floor((diff % 60000) / 1000);
     const pad = (n) => String(n).padStart(2, '0');
 
-    document.getElementById('cd-days').innerText = pad(d);
-    document.getElementById('cd-hours').innerText = pad(h);
-    document.getElementById('cd-mins').innerText = pad(m);
-    document.getElementById('cd-secs').innerText = pad(s);
+    $('#cd-days').textContent = pad(d);
+    $('#cd-hours').textContent = pad(h);
+    $('#cd-mins').textContent = pad(m);
+    $('#cd-secs').textContent = pad(s);
   }
+
   tick();
   setInterval(tick, 1000);
 }
