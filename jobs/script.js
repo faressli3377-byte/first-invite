@@ -40,6 +40,7 @@ const $$ = (sel) => document.querySelectorAll(sel);
          initScrollAnimations();
          initRoots();
          initCountdown();
+         initRSVP();
          initGuestbook();
          spawnPetals();
          updateNavDots();
@@ -79,58 +80,153 @@ function createParticles() {
    MUSIC
    ============================================================ */
 let musicPlaying = false;
+let pendingMusicStart = false;
 
 function startMusic() {
   const audio = $('#bgMusic');
-  // We use a royalty-free fallback piano track since the Discord URL
-  // requires authentication and cannot be used directly as audio src.
-  // Replace this src with any direct MP3/OGG URL you have access to.
-  audio.src = 'https://cdn.pixabay.com/audio/2023/03/13/audio_9a8e0b8abe.mp3';
+  if (!audio) return;
+
+  // Always explicitly set the src — ./music.mp3 anchors to current dir on GitHub Pages
+  audio.src = './music.mp3';
+  audio.load();
   audio.volume = 0.35;
-  audio.play().then(() => {
-    musicPlaying = true;
-    $('#musicIcon').textContent = '♪';
-  }).catch(() => {
-    // Autoplay blocked; user can click toggle manually
-  });
+  audio.muted = false;
+  audio.preload = 'auto';
+  pendingMusicStart = true;
+  syncMusicButton();
+
+  const playPromise = audio.play();
+  if (playPromise && typeof playPromise.then === 'function') {
+    playPromise.then(() => {
+      musicPlaying = true;
+      pendingMusicStart = false;
+      syncMusicButton();
+    }).catch(() => {
+      pendingMusicStart = false;
+      musicPlaying = !audio.paused;
+      syncMusicButton();
+      attachDeferredPlayback(audio);
+    });
+  } else {
+    musicPlaying = !audio.paused;
+    pendingMusicStart = false;
+    syncMusicButton();
+  }
 }
 
-$('#musicToggle').addEventListener('click', () => {
+function syncMusicButton() {
+  const icon = $('#musicIcon');
+  const toggle = $('#musicToggle');
+  if (!icon || !toggle) return;
+
+  icon.textContent = musicPlaying ? '♪' : (pendingMusicStart ? '…' : '♫');
+  toggle.setAttribute('aria-pressed', String(musicPlaying));
+  toggle.setAttribute('aria-label', musicPlaying ? 'Pause background music' : 'Play background music');
+}
+
+function attachDeferredPlayback(audio) {
+  const retry = () => {
+    audio.play().then(() => {
+      musicPlaying = true;
+      syncMusicButton();
+    }).catch(() => {
+      musicPlaying = false;
+      syncMusicButton();
+    }).finally(() => {
+      window.removeEventListener('touchstart', retry);
+      window.removeEventListener('click', retry);
+      window.removeEventListener('keydown', retry);
+    });
+  };
+
+  window.addEventListener('touchstart', retry, { once: true, passive: true });
+  window.addEventListener('click', retry, { once: true, passive: true });
+  window.addEventListener('keydown', retry, { once: true });
+}
+
+$('#musicToggle').addEventListener('click', async () => {
   const audio = $('#bgMusic');
-  if (musicPlaying) {
-    audio.pause(); musicPlaying = false;
-    $('#musicIcon').textContent = '♫';
-  } else {
-    audio.play(); musicPlaying = true;
-    $('#musicIcon').textContent = '♪';
+  if (!audio) return;
+  if (!audio.src) audio.src = 'music.mp3';
+
+  if (musicPlaying && !audio.paused) {
+    audio.pause();
+    musicPlaying = false;
+    pendingMusicStart = false;
+    syncMusicButton();
+    return;
   }
+
+  pendingMusicStart = true;
+  syncMusicButton();
+  try {
+    await audio.play();
+    musicPlaying = true;
+  } catch {
+    musicPlaying = false;
+  } finally {
+    pendingMusicStart = false;
+    syncMusicButton();
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  const audio = $('#bgMusic');
+  if (!audio) return;
+  musicPlaying = !audio.paused && !document.hidden;
+  syncMusicButton();
 });
 
 /* ============================================================
    SCROLL ANIMATIONS (GSAP ScrollTrigger)
    ============================================================ */
 function initScrollAnimations() {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   $$('.reveal-item').forEach((el) => {
     const delay = parseFloat(el.dataset.delay || 0);
     gsap.to(el, {
       opacity: 1,
       y: 0,
-      duration: 1,
+      duration: reduceMotion ? 0.2 : 1,
       delay,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
-        start: 'top 85%',
+        start: 'top 88%',
         toggleActions: 'play none none none',
       },
     });
   });
 
-  // Hero parallax
-  gsap.to('.hero-bg-overlay', {
-    yPercent: 30,
-    ease: 'none',
-    scrollTrigger: { trigger: '#hero', scrub: true },
+  // Section-level soft fade for premium reveal flow
+  gsap.utils.toArray('.section-padding').forEach((section) => {
+    gsap.fromTo(section,
+      { opacity: 0.94, y: 18 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: reduceMotion ? 0.2 : 0.9,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 92%',
+          toggleActions: 'play none none none',
+        },
+      },
+    );
+  });
+
+  // Soft parallax on decorative backgrounds
+  gsap.utils.toArray('.parallax-bg').forEach((bg) => {
+    gsap.to(bg, {
+      yPercent: reduceMotion ? 0 : 12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: bg.closest('section') || bg,
+        scrub: reduceMotion ? false : 0.7,
+      },
+    });
   });
 
   // Timeline line draw
@@ -239,10 +335,58 @@ function initGuestbook() {
 }
 
 /* ============================================================
+   RSVP
+   ============================================================ */
+function initRSVP() {
+  const form = $('#rsvpForm');
+  if (!form) return;
+
+  const success = $('#rsvpSuccess');
+  const nameInput = $('#rsvpName');
+  const guestsInput = $('#rsvpGuests');
+  const noteInput = $('#rsvpNote');
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = nameInput.value.trim();
+    const guests = Math.max(1, Math.min(6, parseInt(guestsInput.value || '1', 10)));
+    const status = form.querySelector('input[name="attendance"]:checked')?.value || 'joyfully_attending';
+    const note = noteInput.value.trim();
+
+    if (!name) {
+      nameInput.focus();
+      success.textContent = 'Please add your name before sending.';
+      success.style.color = '#8B2D2D';
+      return;
+    }
+
+    const payload = {
+      name,
+      guests,
+      status,
+      note,
+      ts: Date.now(),
+    };
+
+    const data = JSON.parse(localStorage.getItem('wedding_rsvp') || '[]');
+    data.push(payload);
+    localStorage.setItem('wedding_rsvp', JSON.stringify(data));
+
+    form.reset();
+    guestsInput.value = '1';
+    success.textContent = status === 'joyfully_attending'
+      ? 'RSVP received. We cannot wait to celebrate with you.'
+      : 'Your RSVP is received with love. You will be missed dearly.';
+    success.style.color = '';
+    gsap.fromTo('.rsvp-card', { y: 0 }, { y: -3, duration: 0.14, yoyo: true, repeat: 1 });
+  });
+}
+
+/* ============================================================
    NAV DOTS
    ============================================================ */
 function updateNavDots() {
-  const sections = ['hero','roots','program','dresscode','venue','guestbook'];
+  const sections = ['hero','roots','program','dresscode','venue','rsvp','guestbook'];
   const dots = $$('.nav-dot');
 
   function setActive() {
@@ -268,3 +412,13 @@ function updateNavDots() {
     });
   });
 }
+
+['play', 'pause', 'ended'].forEach((evt) => {
+  $('#bgMusic').addEventListener(evt, () => {
+    musicPlaying = !$('#bgMusic').paused;
+    pendingMusicStart = false;
+    syncMusicButton();
+  });
+});
+
+syncMusicButton();
