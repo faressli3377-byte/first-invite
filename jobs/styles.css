@@ -40,11 +40,16 @@ body {
   color: var(--text);
   font-family: var(--sans);
   overflow-x: hidden;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img {
   display: block;
   max-width: 100%;
+  object-fit: cover;
 }
 
 a {
@@ -61,7 +66,7 @@ button {
 
 /* ── Utilities ── */
 .section-padding {
-  padding: 100px 24px;
+  padding: 110px 24px;
 }
 
 .reveal-item {
@@ -145,9 +150,10 @@ button {
   font-size: 0.85rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  transition: background var(--transition), color var(--transition);
+  transition: background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.2);
 }
 
 .enter-btn::before {
@@ -166,6 +172,8 @@ button {
 
 .enter-btn:hover {
   color: var(--dark);
+  transform: translateY(-2px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
 }
 
 .enter-btn-icon {
@@ -201,12 +209,17 @@ button {
   position: relative;
   overflow: hidden;
   text-align: center;
+  background-attachment: fixed;
 }
 
 .hero-bg-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(184, 147, 90, 0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(184, 147, 90, 0.16) 0%, transparent 70%);
+}
+
+.parallax-bg {
+  will-change: transform;
 }
 
 .hero-content {
@@ -339,7 +352,7 @@ button {
 
 .section-header {
   text-align: center;
-  margin-bottom: 72px;
+  margin-bottom: 78px;
 }
 
 .section-label {
@@ -364,6 +377,9 @@ button {
   font-size: clamp(1rem, 2.5vw, 1.25rem);
   color: var(--text-lt);
   font-style: italic;
+  line-height: 1.7;
+  max-width: 740px;
+  margin: 0 auto;
 }
 
 .roots-grid {
@@ -395,6 +411,12 @@ button {
   position: relative;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.root-circle:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.2);
 }
 
 .root-img {
@@ -580,6 +602,13 @@ button {
   border: 1px solid rgba(184, 147, 90, 0.2);
   padding: 28px 32px;
   backdrop-filter: blur(4px);
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.timeline-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(184, 147, 90, 0.45);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
 .timeline-card.left {
@@ -826,12 +855,126 @@ button {
   font-size: 0.85rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: background var(--transition), transform var(--transition);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 14px 30px rgba(24, 35, 27, 0.25);
 }
 
 .navigate-btn:hover {
   background: var(--green-lt);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 18px 36px rgba(24, 35, 27, 0.32);
+}
+
+/* ============================================================
+   RSVP
+   ============================================================ */
+.rsvp {
+  background: linear-gradient(180deg, #f9f4ec 0%, #f4ebdc 100%);
+}
+
+.rsvp-card {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(184, 147, 90, 0.35);
+  box-shadow: 0 22px 60px rgba(82, 63, 38, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.rsvp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rsvp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rsvp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rsvp-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.rsvp-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(184, 147, 90, 0.28);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--dark2);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rsvp-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.14);
+}
+
+.rsvp-textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+.rsvp-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rsvp-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(184, 147, 90, 0.28);
+  background: rgba(255, 255, 255, 0.72);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.rsvp-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(184, 147, 90, 0.55);
+}
+
+.rsvp-option input {
+  accent-color: var(--gold);
+}
+
+.rsvp-option span {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dark2);
+}
+
+.rsvp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 6px;
+}
+
+.rsvp-success {
+  min-height: 20px;
+  font-size: 0.85rem;
+  color: var(--green);
+  font-family: var(--corm);
+  font-style: italic;
 }
 
 /* ============================================================
@@ -841,6 +984,15 @@ button {
   background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
   position: relative;
   overflow: hidden;
+}
+
+.guestbook-bg {
+  position: absolute;
+  inset: -16% 0;
+  background:
+    radial-gradient(circle at 80% 18%, rgba(212, 169, 106, 0.12), transparent 34%),
+    radial-gradient(circle at 22% 84%, rgba(184, 147, 90, 0.1), transparent 35%);
+  pointer-events: none;
 }
 
 .guestbook .section-title {
@@ -855,9 +1007,10 @@ button {
   max-width: 680px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(184, 147, 90, 0.3);
+  border: 1px solid rgba(184, 147, 90, 0.34);
   backdrop-filter: blur(20px);
   padding: 48px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .guestbook-label {
@@ -886,7 +1039,7 @@ button {
   padding: 20px;
   resize: none;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .guestbook-textarea::placeholder {
@@ -895,6 +1048,8 @@ button {
 
 .guestbook-textarea:focus {
   border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.16);
+  transform: translateY(-1px);
 }
 
 .guestbook-footer-row {
@@ -920,12 +1075,15 @@ button {
   font-size: 0.82rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: background var(--transition), color var(--transition);
+  transition: background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
 }
 
 .send-btn:hover {
   background: var(--gold);
   color: var(--dark);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
 }
 
 .guestbook-success {
@@ -1009,6 +1167,12 @@ button {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(184, 147, 90, 0.2);
   padding: 20px 16px;
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.countdown-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(184, 147, 90, 0.45);
 }
 
 .countdown-num {
@@ -1069,13 +1233,15 @@ button {
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .music-toggle:hover {
   transform: scale(1.1);
   background: var(--gold);
   color: var(--dark);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
 }
 
 .music-toggle.hidden {
@@ -1117,45 +1283,50 @@ button {
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
 
-  /* ── Roots: side-by-side circles ── */
+  /* ── Roots: force side-by-side circles (user-specified exact rules) ── */
+  .roots-container,
   .roots-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 12px;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-evenly !important;
+    align-items: center !important;
+    gap: 5px !important;
+    display: flex !important;
+    overflow: hidden;
   }
 
   .root-card {
-    flex: 1;
+    width: 45% !important;
+    flex: 0 0 45% !important;
+    margin: 0 !important;
     min-width: 0;
-    gap: 16px;
+    overflow: hidden;
+  }
+
+  .root-circle {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  .roots-center-symbol {
+    display: none !important;
+  }
+
+  .root-circle-wrapper {
+    align-items: center;
+  }
+
+  .root-img {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   /* Hide prose text on mobile — circles + names take centre stage */
   .root-text {
     display: none;
-  }
-
-  /* Center symbol becomes a small vertical pip between the two cards */
-  .roots-center-symbol {
-    flex-direction: column;
-    padding-top: 60px;
-    flex-shrink: 0;
-    gap: 8px;
-  }
-
-  .roots-vine {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, transparent, var(--gold));
-  }
-
-  .roots-vine.bottom {
-    background: linear-gradient(to bottom, var(--gold), transparent);
   }
 
   /* ── Timeline ── */
@@ -1186,6 +1357,15 @@ button {
   .venue-img-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .rsvp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rsvp-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1193,10 +1373,10 @@ button {
     padding: 70px 16px;
   }
 
-  /* Circles scale with viewport so they always fit side-by-side */
+  /* Fixed size circles that fit comfortably side-by-side */
   .root-circle {
-    width: min(40vw, 160px);
-    height: min(40vw, 160px);
+    width: 130px !important;
+    height: 130px !important;
   }
 
   .root-name {
@@ -1209,6 +1389,10 @@ button {
 
   .guestbook-glass {
     padding: 28px 20px;
+  }
+
+  .rsvp-card {
+    padding: 26px 18px;
   }
 
   .guestbook-footer-row {
