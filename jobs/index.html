@@ -316,18 +316,22 @@
 
       <div class="rsvp-card reveal-item">
         <form id="rsvpForm" class="rsvp-form" novalidate>
-          <div class="rsvp-grid">
-            <label class="rsvp-field">
-              <span class="rsvp-label">Your Name</span>
-              <input id="rsvpName" class="rsvp-input" type="text" maxlength="80" placeholder="Enter your full name"
-                required />
-            </label>
-            <label class="rsvp-field">
-              <span class="rsvp-label">Number of Guests</span>
-              <input id="rsvpGuests" class="rsvp-input" type="number" min="1" max="6" value="1" required />
-            </label>
+
+          <!-- Floating label: Name -->
+          <div class="rsvp-float-field">
+            <input id="rsvpName" class="rsvp-float-input" type="text" maxlength="80" placeholder=" " required />
+            <label class="rsvp-float-label" for="rsvpName">Your Full Name</label>
+            <span class="rsvp-float-line"></span>
           </div>
 
+          <!-- Floating label: Guests -->
+          <div class="rsvp-float-field">
+            <input id="rsvpGuests" class="rsvp-float-input" type="number" min="1" max="6" placeholder=" " value="1" required />
+            <label class="rsvp-float-label" for="rsvpGuests">Number of Guests (1–6)</label>
+            <span class="rsvp-float-line"></span>
+          </div>
+
+          <!-- Attendance options -->
           <div class="rsvp-options" role="radiogroup" aria-label="Attendance status">
             <label class="rsvp-option">
               <input type="radio" name="attendance" value="joyfully_attending" checked />
@@ -339,19 +343,22 @@
             </label>
           </div>
 
-          <label class="rsvp-field">
-            <span class="rsvp-label">Note (Optional)</span>
-            <textarea id="rsvpNote" class="rsvp-input rsvp-textarea" rows="3" maxlength="220"
-              placeholder="Dietary notes or a sweet message..."></textarea>
-          </label>
+          <!-- Floating label: Note -->
+          <div class="rsvp-float-field">
+            <textarea id="rsvpNote" class="rsvp-float-input rsvp-float-textarea" rows="3" maxlength="220" placeholder=" "></textarea>
+            <label class="rsvp-float-label" for="rsvpNote">A Sweet Note (Optional)</label>
+            <span class="rsvp-float-line"></span>
+          </div>
 
+          <!-- Submit -->
           <div class="rsvp-actions">
-            <button type="submit" id="rsvpSubmitBtn" class="send-btn">
-              <span>Send RSVP</span>
+            <button type="submit" id="rsvpSubmitBtn" class="rsvp-submit-btn">
+              <span>Confirm Attendance</span>
               <span class="send-icon">♡</span>
             </button>
-            <p id="rsvpSuccess" class="rsvp-success" aria-live="polite"></p>
           </div>
+          <p id="rsvpSuccess" class="rsvp-success" aria-live="polite"></p>
+
         </form>
       </div>
     </section>
@@ -428,13 +435,8 @@
 
   </main>
 
-  <!-- Music player (hidden) -->
-  <audio id="bgMusic" src="music.mp3" loop preload="auto" playsinline webkit-playsinline></audio>
-
-  <!-- Music toggle button -->
-  <button id="musicToggle" class="music-toggle hidden" aria-label="Toggle background music" aria-pressed="true">
-    <span id="musicIcon">♪</span>
-  </button>
+  <!-- Music player (hidden) — plays silently in background, no UI toggle -->
+  <audio id="bgMusic" src="./music.mp3" loop preload="auto" playsinline webkit-playsinline></audio>
 
   <!-- Nav dots -->
   <nav class="side-nav" id="sideNav" aria-label="Section navigation">
