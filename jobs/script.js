@@ -213,14 +213,7 @@ function initCountdown() {
   const target = new Date('2026-07-10T18:00:00');
 
   function tick() {
-    const diff = target - Date.now();
-    if (diff <= 0) {
-      $('#cd-days').textContent = '00';
-      $('#cd-hours').textContent = '00';
-      $('#cd-mins').textContent = '00';
-      $('#cd-secs').textContent = '00';
-      return;
-    }
+    const diff = Math.abs(target - Date.now());
 
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
