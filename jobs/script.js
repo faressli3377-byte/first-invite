@@ -77,105 +77,38 @@ function createParticles() {
 }
 
 /* ============================================================
-   MUSIC
+   MUSIC — plays silently in background, no visible UI
    ============================================================ */
 let musicPlaying = false;
-let pendingMusicStart = false;
 
 function startMusic() {
   const audio = $('#bgMusic');
   if (!audio) return;
 
-  // Always explicitly set the src — ./music.mp3 anchors to current dir on GitHub Pages
+  // Explicit src for GitHub Pages compatibility
   audio.src = './music.mp3';
   audio.load();
   audio.volume = 0.35;
   audio.muted = false;
-  audio.preload = 'auto';
-  pendingMusicStart = true;
-  syncMusicButton();
 
   const playPromise = audio.play();
-  if (playPromise && typeof playPromise.then === 'function') {
-    playPromise.then(() => {
-      musicPlaying = true;
-      pendingMusicStart = false;
-      syncMusicButton();
-    }).catch(() => {
-      pendingMusicStart = false;
-      musicPlaying = !audio.paused;
-      syncMusicButton();
-      attachDeferredPlayback(audio);
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      // Autoplay blocked — attach deferred retry on next user interaction
+      const retry = () => {
+        audio.play().catch(() => {});
+        window.removeEventListener('touchstart', retry);
+        window.removeEventListener('click', retry);
+        window.removeEventListener('keydown', retry);
+      };
+      window.addEventListener('touchstart', retry, { once: true, passive: true });
+      window.addEventListener('click', retry, { once: true, passive: true });
+      window.addEventListener('keydown', retry, { once: true });
     });
-  } else {
-    musicPlaying = !audio.paused;
-    pendingMusicStart = false;
-    syncMusicButton();
   }
 }
 
-function syncMusicButton() {
-  const icon = $('#musicIcon');
-  const toggle = $('#musicToggle');
-  if (!icon || !toggle) return;
 
-  icon.textContent = musicPlaying ? '♪' : (pendingMusicStart ? '…' : '♫');
-  toggle.setAttribute('aria-pressed', String(musicPlaying));
-  toggle.setAttribute('aria-label', musicPlaying ? 'Pause background music' : 'Play background music');
-}
-
-function attachDeferredPlayback(audio) {
-  const retry = () => {
-    audio.play().then(() => {
-      musicPlaying = true;
-      syncMusicButton();
-    }).catch(() => {
-      musicPlaying = false;
-      syncMusicButton();
-    }).finally(() => {
-      window.removeEventListener('touchstart', retry);
-      window.removeEventListener('click', retry);
-      window.removeEventListener('keydown', retry);
-    });
-  };
-
-  window.addEventListener('touchstart', retry, { once: true, passive: true });
-  window.addEventListener('click', retry, { once: true, passive: true });
-  window.addEventListener('keydown', retry, { once: true });
-}
-
-$('#musicToggle').addEventListener('click', async () => {
-  const audio = $('#bgMusic');
-  if (!audio) return;
-  if (!audio.src) audio.src = 'music.mp3';
-
-  if (musicPlaying && !audio.paused) {
-    audio.pause();
-    musicPlaying = false;
-    pendingMusicStart = false;
-    syncMusicButton();
-    return;
-  }
-
-  pendingMusicStart = true;
-  syncMusicButton();
-  try {
-    await audio.play();
-    musicPlaying = true;
-  } catch {
-    musicPlaying = false;
-  } finally {
-    pendingMusicStart = false;
-    syncMusicButton();
-  }
-});
-
-document.addEventListener('visibilitychange', () => {
-  const audio = $('#bgMusic');
-  if (!audio) return;
-  musicPlaying = !audio.paused && !document.hidden;
-  syncMusicButton();
-});
 
 /* ============================================================
    SCROLL ANIMATIONS (GSAP ScrollTrigger)
@@ -413,12 +346,4 @@ function updateNavDots() {
   });
 }
 
-['play', 'pause', 'ended'].forEach((evt) => {
-  $('#bgMusic').addEventListener(evt, () => {
-    musicPlaying = !$('#bgMusic').paused;
-    pendingMusicStart = false;
-    syncMusicButton();
-  });
-});
 
-syncMusicButton();
