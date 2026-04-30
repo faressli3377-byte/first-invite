@@ -873,61 +873,94 @@ button {
 }
 
 .rsvp-card {
-  max-width: 760px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(184, 147, 90, 0.35);
-  box-shadow: 0 22px 60px rgba(82, 63, 38, 0.12);
-  backdrop-filter: blur(8px);
+  padding: 56px 52px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(184, 147, 90, 0.3);
+  box-shadow:
+    0 30px 80px rgba(82, 63, 38, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .rsvp-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 36px;
 }
 
-.rsvp-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+/* ── Floating label fields ── */
+.rsvp-float-field {
+  position: relative;
+  padding-top: 20px;
 }
 
-.rsvp-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.rsvp-float-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(184, 147, 90, 0.4);
+  padding: 10px 0 10px;
+  font-family: var(--corm);
+  font-size: 1.1rem;
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.35s ease;
+  letter-spacing: 0.03em;
 }
 
-.rsvp-label {
+.rsvp-float-input:focus {
+  border-bottom-color: var(--gold);
+}
+
+/* The animated gold underline */
+.rsvp-float-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.rsvp-float-input:focus~.rsvp-float-line {
+  width: 100%;
+}
+
+/* Floating label */
+.rsvp-float-label {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  font-family: var(--sans);
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
+  color: var(--text-lt);
+  pointer-events: none;
+  transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+}
+
+/* Float the label up when focused or filled */
+.rsvp-float-input:focus~.rsvp-float-label,
+.rsvp-float-input:not(:placeholder-shown)~.rsvp-float-label {
+  top: 0;
+  font-size: 0.62rem;
   color: var(--gold);
+  letter-spacing: 0.28em;
 }
 
-.rsvp-input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(184, 147, 90, 0.28);
-  background: rgba(255, 255, 255, 0.85);
-  color: var(--dark2);
-  font-size: 0.92rem;
-  outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.rsvp-float-textarea {
+  resize: none;
+  min-height: 70px;
+  line-height: 1.7;
 }
 
-.rsvp-input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.14);
-}
-
-.rsvp-textarea {
-  resize: vertical;
-  min-height: 84px;
-}
-
+/* ── Radio options ── */
 .rsvp-options {
   display: flex;
   gap: 12px;
@@ -939,15 +972,17 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border: 1px solid rgba(184, 147, 90, 0.28);
-  background: rgba(255, 255, 255, 0.72);
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  padding: 10px 18px;
+  border: 1px solid rgba(184, 147, 90, 0.3);
+  background: rgba(255, 255, 255, 0.6);
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  cursor: pointer;
 }
 
 .rsvp-option:hover {
   transform: translateY(-1px);
-  border-color: rgba(184, 147, 90, 0.55);
+  border-color: var(--gold);
+  background: rgba(184, 147, 90, 0.06);
 }
 
 .rsvp-option input {
@@ -955,26 +990,76 @@ button {
 }
 
 .rsvp-option span {
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--dark2);
 }
 
+/* ── Submit button ── */
 .rsvp-actions {
   display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.rsvp-submit-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-top: 6px;
+  gap: 10px;
+  padding: 16px 52px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+  box-shadow: 0 6px 20px rgba(184, 147, 90, 0.12);
+}
+
+.rsvp-submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  transform: translateX(-101%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+}
+
+.rsvp-submit-btn:hover::before {
+  transform: translateX(0);
+}
+
+.rsvp-submit-btn:hover {
+  color: var(--dark);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 36px rgba(184, 147, 90, 0.28),
+    0 0 0 4px rgba(184, 147, 90, 0.08);
+}
+
+.rsvp-submit-btn span,
+.rsvp-submit-btn .send-icon {
+  position: relative;
+  z-index: 1;
 }
 
 .rsvp-success {
+  text-align: center;
   min-height: 20px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--green);
   font-family: var(--corm);
   font-style: italic;
+  letter-spacing: 0.05em;
+  margin-top: -16px;
 }
 
 /* ============================================================
@@ -1214,39 +1299,7 @@ button {
   letter-spacing: 0.1em;
 }
 
-/* ============================================================
-   MUSIC TOGGLE
-   ============================================================ */
-.music-toggle {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 1000;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(26, 23, 20, 0.8);
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
-  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-}
-
-.music-toggle:hover {
-  transform: scale(1.1);
-  background: var(--gold);
-  color: var(--dark);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
-}
-
-.music-toggle.hidden {
-  display: none;
-}
+/* ── Music toggle removed — music plays silently in background ── */
 
 /* ============================================================
    SIDE NAV DOTS
